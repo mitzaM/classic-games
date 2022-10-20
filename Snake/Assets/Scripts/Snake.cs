@@ -73,4 +73,13 @@ public class Snake : MonoBehaviour {
         this.transform.position = Vector3.zero;
         this._direction = Vector2.right;
     }
+
+    public bool Occupies(float x, float y) {
+        foreach (Transform segment in this._segments) {
+            if (segment.position.x == x && segment.position.y == y) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

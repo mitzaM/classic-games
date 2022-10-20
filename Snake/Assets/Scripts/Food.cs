@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class Food : MonoBehaviour {
     public BoxCollider2D arena;
+    private Snake snake;
+
+    private void Awake() {
+        snake = FindObjectOfType<Snake>();
+    }
 
     private void Start() {
         this.randomizePosition();
@@ -9,9 +14,12 @@ public class Food : MonoBehaviour {
 
     private void randomizePosition() {
         Bounds bounds = this.arena.bounds;
+        float x, y;
 
-        float x = Random.Range(bounds.min.x, bounds.max.x);
-        float y = Random.Range(bounds.min.y, bounds.max.y);
+        do {
+            x = Random.Range(bounds.min.x, bounds.max.x);
+            y = Random.Range(bounds.min.y, bounds.max.y);
+        } while (snake.Occupies(x, y));
 
         this.transform.position = new Vector3(
             Mathf.Round(x), Mathf.Round(y), 0.0f
