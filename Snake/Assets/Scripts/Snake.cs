@@ -16,14 +16,9 @@ public class Snake : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.W)) {
-            this._direction = Vector2.up;
-        } else if (Input.GetKeyDown(KeyCode.A)) {
-            this._direction = Vector2.left;
-        } else if (Input.GetKeyDown(KeyCode.S)) {
-            this._direction = Vector2.down;
-        } else if (Input.GetKeyDown(KeyCode.D)) {
-            this._direction = Vector2.right;
+        Vector2 input = this.GetInput();
+        if (input != Vector2.zero) {
+            this._direction = input;
         }
     }
 
@@ -72,6 +67,24 @@ public class Snake : MonoBehaviour {
 
         this.transform.position = Vector3.zero;
         this._direction = Vector2.right;
+    }
+
+    private Vector2 GetInput() {
+        Vector2 input = Vector2.zero;
+        if (this._direction.x != 0.0f) {
+            if (Input.GetKeyDown(KeyCode.W)) {
+                input = Vector2.up;
+            } else if (Input.GetKeyDown(KeyCode.S)) {
+                input = Vector2.down;
+            }
+        } else if (this._direction.y != 0.0f) {
+            if (Input.GetKeyDown(KeyCode.A)) {
+                input = Vector2.left;
+            } else if (Input.GetKeyDown(KeyCode.D)) {
+                input = Vector2.right;
+            }
+        }
+        return input;
     }
 
     public bool Occupies(float x, float y) {
