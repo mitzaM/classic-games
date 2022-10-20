@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class Food : MonoBehaviour
-{
+public class Food : MonoBehaviour {
     public BoxCollider2D arena;
 
     private void Start() {
@@ -20,7 +19,7 @@ public class Food : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if (other.tag == "Player") {
+        if (other.gameObject.CompareTag("Player")) {
             GetComponent<AudioSource>().Play();
             this.randomizePosition();
         }

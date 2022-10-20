@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Snake : MonoBehaviour
-{
+public class Snake : MonoBehaviour {
     public float speed = 20.0f;
     public float speedMultiplier = 1.0f;
     public int initialSize = 4;
@@ -11,7 +10,7 @@ public class Snake : MonoBehaviour
     private Vector2 _direction = Vector2.right;
     private float _nextUpdate;
     private List<Transform> _segments = new List<Transform>();
-    
+
     private void Start() {
         this.ResetState();
     }
@@ -19,8 +18,7 @@ public class Snake : MonoBehaviour
     private void Update() {
         if (Input.GetKeyDown(KeyCode.W)) {
             this._direction = Vector2.up;
-        }
-        else if (Input.GetKeyDown(KeyCode.A)) {
+        } else if (Input.GetKeyDown(KeyCode.A)) {
             this._direction = Vector2.left;
         } else if (Input.GetKeyDown(KeyCode.S)) {
             this._direction = Vector2.down;
@@ -47,9 +45,9 @@ public class Snake : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if (other.tag == "Food") {
+        if (other.gameObject.CompareTag("Food")) {
             this.Grow();
-        } else if (other.tag == "Obstacle") {
+        } else if (other.gameObject.CompareTag("Obstacle")) {
             GetComponent<AudioSource>().Play();
             this.ResetState();
         }
