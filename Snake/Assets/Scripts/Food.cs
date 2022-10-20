@@ -17,13 +17,11 @@ public class Food : MonoBehaviour {
         float x, y;
 
         do {
-            x = Random.Range(bounds.min.x, bounds.max.x);
-            y = Random.Range(bounds.min.y, bounds.max.y);
+            x = Mathf.Round(Random.Range(bounds.min.x, bounds.max.x));
+            y = Mathf.Round(Random.Range(bounds.min.y, bounds.max.y));
         } while (snake.Occupies(x, y));
 
-        this.transform.position = new Vector3(
-            Mathf.Round(x), Mathf.Round(y), 0.0f
-        );
+        this.transform.position = new Vector3(x, y, 0.0f);
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
