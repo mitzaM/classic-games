@@ -9,7 +9,8 @@ public class Snake : MonoBehaviour {
 
     private Vector2 _direction = Vector2.right;
     private float _nextUpdate;
-    private List<Transform> _segments = new List<Transform>();
+    private List<Transform> _tail = new List<Transform>();
+    private bool _shouldGrow = false;
 
     private void Start() {
         this.ResetState();
@@ -23,61 +24,62 @@ public class Snake : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        // if (Time.time < this._nextUpdate) {
-        //     return;
-        // }
-
-        for (int i = this._segments.Count - 1; i > 0; i--) {
-            this._segments[i].position = this._segments[i - 1].position;
+        if (Time.time < this._nextUpdate) {
+            return;
         }
-
-        this.transform.position = new Vector3(
-            Mathf.Round(this.transform.position.x) + this._direction.x,
-            Mathf.Round(this.transform.position.y) + this._direction.y,
-            0.0f
-        );
-        this._nextUpdate = Time.time + 1.0f / (this.speed * this.speedMultiplier);
+        this.Move();
+        this._nextUpdate = Time.time + (1.0f / (this.speed * this.speedMultiplier));
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
         if (other.gameObject.CompareTag("Food")) {
-            this.Grow();
+            this._shouldGrow = true;
         } else if (other.gameObject.CompareTag("Obstacle")) {
             GetComponent<AudioSource>().Play();
             this.ResetState();
         }
     }
 
-    private void Grow() {
-        Transform segment = Instantiate(this.segmentPrefab);
-        segment.position = this._segments[this._segments.Count - 1].position;
-        this._segments.Add(segment);
+    private void Move() {
+        Vector3 headPosition = this.transform.position;
+        this.transform.position = new Vector3(
+            Mathf.Round(this.transform.position.x) + this._direction.x,
+            Mathf.Round(this.transform.position.y) + this._direction.y,
+            0.0f
+        );
+        if (this._tail.Count < this.initialSize) {
+            this._shouldGrow = true;
+        }
+        if (this._shouldGrow) {
+            Transform segment = Instantiate(this.segmentPrefab, headPosition, Quaternion.identity);
+            this._tail.Insert(0, segment);
+            this._shouldGrow = false;
+        } else {
+            for (int i = this._tail.Count - 1; i >= 0; i--) {
+                Vector3 newPosition = i == 0 ? headPosition : this._tail[i - 1].position;
+                this._tail[i].position = newPosition;
+            }
+        }
     }
 
     private void ResetState() {
-        for (int i = 1; i < this._segments.Count; i++) {
-            Destroy(this._segments[i].gameObject);
+        for (int i = 0; i < this._tail.Count; i++) {
+            Destroy(this._tail[i].gameObject);
         }
-        this._segments.Clear();
-        this._segments.Add(this.transform);
-
-        for (int i = 1; i < initialSize; i++) {
-            _segments.Add(Instantiate(this.segmentPrefab));
-        }
-
-        this.transform.position = Vector3.zero;
+        this._tail.Clear();
         this._direction = Vector2.right;
+        this.transform.position = Vector3.zero;
     }
 
     private Vector2 GetInput() {
         Vector2 input = Vector2.zero;
-        if (this._direction.x != 0.0f) {
+        if (this._direction == Vector2.left || this._direction == Vector2.right) {
             if (Input.GetKeyDown(KeyCode.W)) {
                 input = Vector2.up;
             } else if (Input.GetKeyDown(KeyCode.S)) {
                 input = Vector2.down;
             }
-        } else if (this._direction.y != 0.0f) {
+        } else if (this._direction == Vector2.up || this._direction == Vector2.down) {
             if (Input.GetKeyDown(KeyCode.A)) {
                 input = Vector2.left;
             } else if (Input.GetKeyDown(KeyCode.D)) {
@@ -88,11 +90,11 @@ public class Snake : MonoBehaviour {
     }
 
     public bool Occupies(float x, float y) {
-        foreach (Transform segment in this._segments) {
+        foreach (Transform segment in this._tail) {
             if (segment.position.x == x && segment.position.y == y) {
                 return true;
             }
         }
-        return false;
+        return this.transform.position.x == x && this.transform.position.y == y;
     }
 }
